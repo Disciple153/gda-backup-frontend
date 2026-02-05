@@ -8,17 +8,25 @@ const ENV_FILE = '/.env';
 
 const DEFAULT_ENV = `BACKUP_CRON=0 2 * * *
 TARGET_DIR=/backup
+FILTER=
+FILTER_DELIMITER=
+DRY_RUN=false
+LOG_LEVEL=info
+DB_ENGINE=postgres
+POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
 POSTGRES_HOST=database
 POSTGRES_DB=postgres
-POSTGRES_USER=postgres
+MIN_STORAGE_DURATION=
 BUCKET_NAME=
 DYNAMO_TABLE=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=us-east-1
-LOG_LEVEL=info
-DRY_RUN=false`;
+NTFY_URL=
+NTFY_TOPIC=
+NTFY_USERNAME=
+NTFY_PASSWORD=`;
 
 app.get('/env', (req, res) => {
   console.log('GET /env request received');
@@ -55,6 +63,31 @@ app.post('/env', (req, res) => {
   } catch (error) {
     console.error('Error writing .env file:', error);
     res.status(500).json({ error: 'Failed to write .env file' });
+  }
+});
+
+app.get('/ls', (req, res) => {
+  console.log(`GET /ls request received: ${req.query.path || '/' }`);
+  if (!req.query.path) {
+    return res.status(400).json({ error: 'Path parameter is required' });
+  }
+  try {
+    let dir_list = fs.readdirSync(req.query.path as string, { withFileTypes: true })
+    let directories = dir_list.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
+
+    console.log(`Directory listing for ${req.query.path}:`, directories);
+    res.set('Cache-Control', 'no-store');
+    res.json({
+      success: true,
+      path: req.query.path,
+      directories: directories,
+    });
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    res.status(500).json({
+      error: 'Failed to read directory',
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 

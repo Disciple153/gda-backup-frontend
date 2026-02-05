@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start the API server
-node /app/server.js &
+node --import tsx /app/server.ts &
 
 # Start nginx
 nginx -g "daemon off;" &

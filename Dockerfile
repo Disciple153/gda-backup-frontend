@@ -13,8 +13,10 @@ RUN npm install && npm run build
 # Copy built frontend to nginx directory
 RUN mkdir -p /var/www/html && cp -r dist/* /var/www/html/
 
-# Copy simple server
-COPY simple-server.js /app/server.js
+# Copy and build server
+WORKDIR /app
+COPY package.json server.ts ./
+RUN npm install
 
 # Copy nginx config and startup script
 COPY nginx.conf /etc/nginx/nginx.conf
