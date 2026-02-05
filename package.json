@@ -1,0 +1,10 @@
+{
+  "name": "gda-backup-server",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2",
+    "@types/express": "^4.17.17",
+    "typescript": "^5.2.2",
+    "tsx": "^4.7.0"
+  }
+}
