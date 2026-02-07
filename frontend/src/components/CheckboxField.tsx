@@ -1,16 +1,14 @@
-interface CheckboxFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-}
+import type ConfigFieldProps from "../interfaces/ConfigFieldProps";
 
-export default function CheckboxField({ value, onChange }: CheckboxFieldProps) {
+export default function CheckboxField({ configKey, configMap, updateConfig }: ConfigFieldProps) {
+  const value = configMap[configKey];
   const isChecked = value === 'true';
 
   return (
     <input
       type="checkbox"
       checked={isChecked}
-      onChange={(e) => onChange(e.target.checked ? 'true' : 'false')}
+      onChange={(e) => updateConfig(configKey, e.target.checked ? 'true' : 'false')}
       style={{
         width: '20px',
         height: '20px',

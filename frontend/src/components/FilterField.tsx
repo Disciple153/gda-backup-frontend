@@ -1,26 +1,25 @@
 import { useEffect } from 'react';
+import type ConfigFieldProps from '../interfaces/ConfigFieldProps';
 
-interface FilterFieldProps {
-  filterValue: string;
-  delimiterValue: string;
-  onFilterChange: (value: string) => void;
-  onDelimiterChange: (value: string) => void;
-}
+export default function FilterField({ configKey: key, configMap: config, updateConfig }: ConfigFieldProps) {
+  const delimiter_key = `${key}_DELIMITER`;
 
-export default function FilterField({ filterValue, delimiterValue, onFilterChange, onDelimiterChange }: FilterFieldProps) {
+  const filterValue = config[key]
+  const delimiterValue = config[delimiter_key]
+
   const delimiter = delimiterValue || 'DEL';
   const filters = filterValue ? filterValue.split(delimiter) : [''];
   const displayFilters = filters.every(f => f !== '') ? [...filters, ''] : filters;
 
   useEffect(() => {
     if (!delimiterValue) {
-      onDelimiterChange('DEL');
+      updateConfig(delimiter_key, 'DEL');
     }
   }, []);
 
   const updateFilters = (newFilters: string[]) => {
     const nonEmpty = newFilters.filter(f => f !== '');
-    onFilterChange(nonEmpty.join(delimiter));
+    updateConfig(key, nonEmpty.join(delimiter));
   };
 
   const generateDelimiter = (n: number): string => {
@@ -51,8 +50,8 @@ export default function FilterField({ filterValue, delimiterValue, onFilterChang
     // Check if delimiter is in any filter
     if (newFilters.some(f => f.includes(delimiter))) {
       const newDelim = findUnusedDelimiter(newFilters);
-      onDelimiterChange(newDelim);
-      onFilterChange(newFilters.filter(f => f !== '').join(newDelim));
+      updateConfig(delimiter_key, newDelim);
+      updateConfig(key, newFilters.filter(f => f !== '').join(newDelim));
       return;
     }
 

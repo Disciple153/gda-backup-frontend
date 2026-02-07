@@ -1,11 +1,9 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
+import type ConfigFieldProps from '../interfaces/ConfigFieldProps';
 
-interface TargetDirFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-}
+export default function TargetDirField({ configKey, configMap, updateConfig }: ConfigFieldProps): JSX.Element {
+  const value = configMap[configKey]
 
-export default function TargetDirField({ value, onChange }: TargetDirFieldProps) {
   const [directories, setDirectories] = useState<string[]>([]);
   const [currentPath, setCurrentPath] = useState('/');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -30,7 +28,7 @@ export default function TargetDirField({ value, onChange }: TargetDirFieldProps)
     const trimmed = value.replace(/\/+$/, '');
     const parentPath = trimmed.substring(0, trimmed.lastIndexOf('/')) || '/';
     const finalPath = parentPath === '/' ? '/' : parentPath + '/';
-    onChange(finalPath);
+    updateConfig(configKey, finalPath);
     fetchDirectories(finalPath);
   };
 
@@ -53,7 +51,7 @@ export default function TargetDirField({ value, onChange }: TargetDirFieldProps)
       <div style={{ position: 'relative', flex: 1, width: '100%' }}>
         <textarea
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => updateConfig(configKey, e.target.value)}
           onFocus={() => {
             setShowDropdown(true);
             fetchDirectories(value.substring(0, value.lastIndexOf('/')) || '/');
@@ -92,7 +90,7 @@ export default function TargetDirField({ value, onChange }: TargetDirFieldProps)
                 key={dir}
                 onClick={() => {
                   const newPath = currentPath === '/' ? `/${dir}/` : `${currentPath}/${dir}/`;
-                  onChange(newPath);
+                  updateConfig(configKey, newPath);
                   fetchDirectories(newPath);
                 }}
                 style={{

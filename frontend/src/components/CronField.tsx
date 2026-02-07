@@ -1,9 +1,4 @@
-import { useState, useEffect } from 'react';
-
-interface CronFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-}
+import type ConfigFieldProps from '../interfaces/ConfigFieldProps';
 
 const CRON_PATTERNS = {
   minute: /^(\*|([0-5]?[0-9])(,([0-5]?[0-9]))*|\*\/([0-5]?[0-9])|([0-5]?[0-9])-([0-5]?[0-9]))$/,
@@ -13,7 +8,8 @@ const CRON_PATTERNS = {
   weekday: /^(\*|([0-6]|SUN|MON|TUE|WED|THU|FRI|SAT)(,([0-6]|SUN|MON|TUE|WED|THU|FRI|SAT))*|\*\/([0-6]|SUN|MON|TUE|WED|THU|FRI|SAT)|([0-6]|SUN|MON|TUE|WED|THU|FRI|SAT)-([0-6]|SUN|MON|TUE|WED|THU|FRI|SAT))$/i
 };
 
-export default function CronField({ value, onChange }: CronFieldProps) {
+export default function CronField({ configKey, configMap, updateConfig }: ConfigFieldProps) {
+  const value = configMap[configKey];
   const isSpecial = value.startsWith('@');
   const parts = isSpecial ? [] : value.split(' ');
   const [minute, hour, day, month, weekday] = parts.length === 5 ? parts : ['0', '2', '*', '*', '*'];
@@ -24,7 +20,7 @@ export default function CronField({ value, onChange }: CronFieldProps) {
     const newParts = [...parts];
     while (newParts.length < 5) newParts.push('*');
     newParts[index] = newValue;
-    onChange(newParts.join(' '));
+    updateConfig(configKey, newParts.join(' '));
   };
 
   const inputStyle = (val: string, pattern: RegExp) => ({
@@ -43,7 +39,7 @@ export default function CronField({ value, onChange }: CronFieldProps) {
       <input
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => updateConfig(configKey, e.target.value)}
         placeholder="@yearly, @monthly, @daily, etc."
         spellCheck={false}
         style={{
